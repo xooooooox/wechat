@@ -38,7 +38,7 @@ type AccessTokenResult struct {
 	Scope        string `json:"scope"`
 }
 
-// AccessToken step2
+// AccessToken step2 获取access_token
 func AccessToken(appId, appSecret, code string) (result *AccessTokenResult, err error) {
 	uri := "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code"
 	uri = fmt.Sprintf(uri, appId, appSecret, code)
@@ -52,7 +52,7 @@ func AccessToken(appId, appSecret, code string) (result *AccessTokenResult, err 
 	return result, err
 }
 
-// RefreshToken step2.1
+// RefreshToken step2.1 获取刷新access_token refresh_token
 func RefreshToken(appId, refreshToken string) (result *AccessTokenResult, err error) {
 	uri := "https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=%s&grant_type=refresh_token&refresh_token=%s"
 	uri = fmt.Sprintf(uri, appId, refreshToken)
@@ -79,7 +79,7 @@ type SnsApiUserInfoResult struct {
 	Unionid    string   `json:"unionid"`
 }
 
-// SnsApiUserInfo step3
+// SnsApiUserInfo step3 获取微信个人信息
 func SnsApiUserInfo(accessToken, openid string) (result *SnsApiUserInfoResult, err error) {
 	uri := "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN"
 	uri = fmt.Sprintf(uri, accessToken, openid)
@@ -93,7 +93,7 @@ func SnsApiUserInfo(accessToken, openid string) (result *SnsApiUserInfoResult, e
 	return result, err
 }
 
-// AccessTokenEffective
+// AccessTokenEffective 检验授权凭证(access_token)是否有效
 func AccessTokenEffective(accessToken, openid string) (err error) {
 	uri := "https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s"
 	uri = fmt.Sprintf(uri, accessToken, openid)
@@ -119,7 +119,7 @@ func AccessTokenEffective(accessToken, openid string) (err error) {
 	return nil
 }
 
-// Get http/https request
+// Get http/https request get请求
 func Get(uri string) (result []byte, err error) {
 	cli := &http.Client{}
 	req, err := http.NewRequest("GET", uri, nil)
@@ -134,12 +134,12 @@ func Get(uri string) (result []byte, err error) {
 	return ioutil.ReadAll(res.Body)
 }
 
-// Base64Encrypt
+// Base64Encrypt base64加密
 func Base64Encrypt(plainText []byte) string {
 	return base64.StdEncoding.EncodeToString(plainText)
 }
 
-// Base64Decrypt
+// Base64Decrypt base64解密
 func Base64Decrypt(cipherText string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(cipherText)
 }
