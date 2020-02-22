@@ -1,11 +1,13 @@
 package auth2
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // Web Authorization 网页授权, OAuth2.0机制
@@ -103,4 +105,57 @@ func Get(uri string) (result []byte, err error) {
 	}
 	defer res.Body.Close()
 	return ioutil.ReadAll(res.Body)
+}
+
+// Base64Encrypt
+func Base64Encrypt(plainText []byte) string {
+	return base64.StdEncoding.EncodeToString(plainText)
+}
+
+// Base64Decrypt
+func Base64Decrypt(cipherText string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(cipherText)
+}
+
+// AddKvToUrl url链接中添加键值对
+func AddKvToUrl(uri, key, val string) string {
+	i1 := strings.Index(uri, "?")
+	i2 := strings.Index(uri, "#")
+	s, s1, s2 := "", "", ""
+	if i1 >= 0 {
+		if i2 >= 0 {
+			if i1 < i2 { // ... ? ... # ...
+				s = uri[:i1]
+				s1 = uri[i1:i2]
+				s2 = uri[i2:]
+			} else { // ... # ... ? ...
+				s = uri[:i2]
+				s1 = uri[i2:]
+				s2 = uri[i2:i1]
+			}
+		} else { // ... ? ...
+			s = uri[:i1]
+			s1 = uri[i1:]
+		}
+	} else {
+		if i2 >= 0 { // ... # ...
+			s = uri[:i2]
+			s2 = uri[i2:]
+		} else { // ...
+			s = uri
+		}
+	}
+	tmp := strings.Index(s1, "?")
+	if tmp > 0 {
+		s1 = s1[tmp:]
+	}
+	lens1 := len(s1)
+	if lens1 == 0 {
+		s1 = fmt.Sprintf("%s?%s=%s", s1, key, val)
+	} else if lens1 == 1 {
+		s1 = fmt.Sprintf("%s%s=%s", s1, key, val)
+	} else {
+		s1 = fmt.Sprintf("%s&%s=%s", s1, key, val)
+	}
+	return fmt.Sprintf("%s%s%s", s, s1, s2)
 }
