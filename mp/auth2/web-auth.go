@@ -3,6 +3,7 @@ package auth2
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -90,6 +91,32 @@ func SnsApiUserInfo(accessToken, openid string) (result *SnsApiUserInfoResult, e
 	err = json.Unmarshal(bytes, &tmp)
 	result = &tmp
 	return result, err
+}
+
+// AccessTokenEffective
+func AccessTokenEffective(accessToken, openid string) (err error) {
+	uri := "https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s"
+	uri = fmt.Sprintf(uri, accessToken, openid)
+	resBytes, err := Get(uri)
+	if err != nil {
+		return err
+	}
+	type result struct {
+		Errcode int    `json:"errcode"`
+		Errmsg  string `json:"errmsg"`
+	}
+	tmp := result{}
+	err = json.Unmarshal(resBytes, &tmp)
+	if err != nil {
+		return err
+	}
+	// 无效的AccessToken
+	if tmp.Errcode != 0 {
+		err = errors.New("access_token is invalid")
+		return err
+	}
+	// 有效的AccessToken
+	return nil
 }
 
 // Get http/https request
