@@ -29,7 +29,7 @@ func CodeRedirectUri(appId, redirectUri, scope, state string) string {
 // AccessTokenResult
 type AccessTokenResult struct {
 	AccessToken  string `json:"access_token"`
-	ExpiresToken int    `json:"expires_token"`
+	ExpiresIn    int    `json:"expires_in"`
 	RefreshToken string `json:"refresh_token"`
 	Openid       string `json:"openid"`
 	Scope        string `json:"scope"`
@@ -49,24 +49,15 @@ func AccessToken(appId, appSecret, code string) (result *AccessTokenResult, err 
 	return result, err
 }
 
-// RefreshTokenResult
-type RefreshTokenResult struct {
-	AccessToken  string `json:"access_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
-	Openid       string `json:"openid"`
-	Scope        string `json:"scope"`
-}
-
 // RefreshToken step2.1
-func RefreshToken(appId, refreshToken string) (result *RefreshTokenResult, err error) {
+func RefreshToken(appId, refreshToken string) (result *AccessTokenResult, err error) {
 	uri := "https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=%s&grant_type=refresh_token&refresh_token=%s"
 	uri = fmt.Sprintf(uri, appId, refreshToken)
 	bytes, err := Get(uri)
 	if err != nil {
 		return result, err
 	}
-	tmp := RefreshTokenResult{}
+	tmp := AccessTokenResult{}
 	err = json.Unmarshal(bytes, &tmp)
 	result = &tmp
 	return result, err
