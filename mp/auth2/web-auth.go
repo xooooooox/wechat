@@ -70,7 +70,7 @@ func RefreshToken(appId, refreshToken string) (result *AccessTokenResult, err er
 type SnsApiUserInfoResult struct {
 	Openid     string   `json:"openid"`
 	Nickname   string   `json:"nickname"`
-	Sex        int8     `json:"sex"`
+	Sex        int      `json:"sex"`
 	Province   string   `json:"province"`
 	City       string   `json:"city"`
 	Country    string   `json:"country"`
